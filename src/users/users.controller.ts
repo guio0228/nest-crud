@@ -20,7 +20,7 @@ export class UsersController {
 
   @Post()
   @HttpCode(200)
-  @UsePipes(new ValidationPipe())
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async create(@Body() createUserDto: CreateUserDto) {
     try {
       const createdUser = await this.usersService.create(createUserDto);
@@ -31,13 +31,14 @@ export class UsersController {
   }
 
   @Get()
+  @HttpCode(200)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.usersService.findOne(id);
   }
 
   // @Patch(':id')
@@ -46,7 +47,7 @@ export class UsersController {
   // }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.usersService.remove(id);
   }
 }

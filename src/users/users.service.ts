@@ -16,19 +16,24 @@ export class UsersService {
     return this.userRepository.save(newUser);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number): Promise<User> {
+    return this.userRepository.findOneBy({ id });
   }
 
   // update(id: number, updateUserDto: UpdateUserDto) {
   //   return `This action updates a #${id} user`;
   // }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<{ message: string }> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    await this.userRepository.remove(user);
+    return { message: `ID ${id} 已經被刪除` };
   }
 }
