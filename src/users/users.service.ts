@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { error } from 'console';
 @Injectable()
 export class UsersService {
   constructor(
@@ -20,13 +21,21 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  async findOne(id: number): Promise<User> {
-    return this.userRepository.findOneBy({ id });
-  }
-
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
+  // async findOne(id: number): Promise<User> {
+  //   return this.userRepository.findOneBy({ id });
   // }
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new error(`ID ${id} not found`);
+    }
+
+    this.userRepository.merge(user, updateUserDto);
+
+    const updatedUser = await this.userRepository.save(user);
+    return updatedUser;
+  }
 
   async remove(id: number): Promise<{ message: string }> {
     const user = await this.userRepository.findOneBy({ id });
